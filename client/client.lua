@@ -109,7 +109,7 @@ end, false) -- this true bool means that the user cannot execute the command unl
 
 
 --[[
-  Weather
+  Weather & Time
   Weather types list : https://github.com/femga/rdr3_discoveries/blob/master/weather/weather_types.lua
 ]]--
 
@@ -118,7 +118,7 @@ RegisterCommand("setweather", function(source, args)
   TriggerEvent('chat:addMessage', {
       color = { 255, 0, 0},
       multiline = true,
-      args = {"Console", "Setting weather to" .. tostring(args[1])}
+      args = {"Console", "Setting weather to " .. tostring(args[1])}
   })
 
   local transition_time_in_seconds = 2.0
@@ -131,7 +131,7 @@ RegisterCommand("setweather", function(source, args)
 
 end, false)
 
-RegisterCommand("clearweather", function(source, args)
+RegisterCommand("clearweather", function()
 
   TriggerEvent('chat:addMessage', {
       color = { 255, 0, 0},
@@ -140,7 +140,93 @@ RegisterCommand("clearweather", function(source, args)
   })
 
   -- to clear weather variation (in this case, THUNDERSTORM will return to the default state):
-
-  -- Citizen.InvokeNative(0x0E71C80FA4EC8147, "THUNDERSTORM", true);
+  ClearOverrideWeather()
+  -- Citizen.InvokeNative(0x0E71C80FA4EC8147, "THUNDERSTORM", true)
 
 end, false)
+
+RegisterCommand("day", function()
+
+  TriggerEvent('chat:addMessage', {
+      color = { 255, 0, 0},
+      multiline = true,
+      args = {"Console", "Setting time to day"}
+  })
+
+
+  Citizen.InvokeNative(0x669E223E64B1903C, 12, 00, 00, 6, true)
+
+end, false)
+
+RegisterCommand("night", function()
+
+  TriggerEvent('chat:addMessage', {
+      color = { 255, 0, 0},
+      multiline = true,
+      args = {"Console", "Setting time to night"}
+  })
+
+
+  Citizen.InvokeNative(0x669E223E64B1903C, 00, 00, 00, 6, true)
+
+end, false)
+
+--[[
+  Teleportation
+]]--
+
+RegisterCommand("tpm", function()
+
+  TriggerEvent('chat:addMessage', {
+      color = { 255, 0, 0},
+      multiline = true,
+      args = {"Console", "Teleporting to marker"}
+  })
+  local player = PlayerPedId()
+  local waypoint = GetWaypointCoords()
+  -- SetEntityCoords(player, waypoint.x, waypoint.y, 1)
+  for height = 1, 1000.0 do
+    SetEntityCoords(player, waypoint.x, waypoint.y, height + 0.0)
+
+    local foundground, groundZ, normal = GetGroundZAndNormalFor_3dCoord(waypoint.x, waypoint.y, height + 0.0)
+    if foundground then
+      SetEntityCoords(player, waypoint.x, waypoint.y, height + 0.0)
+      break
+    end
+    Wait(25)
+  end
+
+end, false)
+
+-- Citizen.CreateThread(function()
+--   local player = PlayerPedId()
+--   while true do
+--     print("okl")
+--     print(GetEntityCoords(player, true, true))
+--     Citizen.Wait(100)
+--   end
+-- end)
+
+
+RegisterCommand("broadcast", function(source, args)
+
+  TriggerEvent('chat:addMessage', {
+      color = { 255, 0, 0},
+      multiline = true,
+      args = {"Console", "Sending message to everyone"}
+  })
+
+  TriggerServerEvent("reminder:broadcast", args)
+
+end, false)
+
+RegisterNetEvent("reminder:broadcast")
+AddEventHandler("reminder:broadcast", function(message)
+
+  TriggerEvent('chat:addMessage', {
+    color = { 150, 0, 0},
+    multiline = true,
+    args = {"BROADCAST", message}
+})
+
+end)
