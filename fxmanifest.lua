@@ -11,7 +11,13 @@ server_scripts {
     'server/server.lua'
 }
 
+ui_page "ui/index.html"
+
 files {
+    "ui/index.html",
+    "ui/reset.css",
+    "ui/main.css",
+    "ui/main.js",
 }
 
 debug_enabled 'true'
